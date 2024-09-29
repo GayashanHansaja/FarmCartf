@@ -74,6 +74,15 @@ export const updateStaff = async (req, res) => {
   }
 };
 
+export const getStaffCount = async (req, res) => {
+  try {
+    const staffCount = await Staff.countDocuments();
+    res.status(200).json({ count: staffCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving customer count', error });
+  }
+};
+
 // Retrieve all staff members
 export const getAllStaff = async (req, res) => {
   try {

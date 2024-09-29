@@ -4,10 +4,13 @@ import {
   updateCustomer,
   getAllCustomers,
   getCustomerById,
-  deleteCustomer
+  deleteCustomer,
+  getCustomerCount
 } from '../../controllers/Admin/AdminCustomerController.js';  // Correct path to Customer controller
 
 const router = express.Router();
+
+router.get('/count', getCustomerCount)
 
 // Route to add a new customer
 router.post('/addCustomer', addCustomer);
@@ -23,5 +26,6 @@ router.get('/:customerId', getCustomerById);
 
 // Route to delete a customer by ID
 router.delete('/:customerId', deleteCustomer);
+
 
 export default router;

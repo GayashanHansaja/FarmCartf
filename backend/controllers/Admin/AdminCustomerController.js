@@ -1,4 +1,4 @@
-import Customer from '../../models/Admin/AdminCustomer.js'; // Correct path to Customer model
+import Customer from '../../models/Admin/AdminCustomer.js';  // Correct path to Customer model
 
 // Add a new customer
 export const addCustomer = async (req, res) => {
@@ -6,17 +6,18 @@ export const addCustomer = async (req, res) => {
     const { name, email, phone, address } = req.body;
 
     // Check if the email is already in use
-    const existingCustomer = await Customer.findOne({ email });
-    if (existingCustomer) {
+    const existingCustomerByEmail = await Customer.findOne({ email });
+    if (existingCustomerByEmail) {
       return res.status(400).json({ message: 'Email is already in use' });
     }
+    
 
     // Create a new customer
     const customer = new Customer({
       name,
       email,
       phone,
-      address
+      address,
     });
 
     // Save the customer to the database
@@ -27,6 +28,17 @@ export const addCustomer = async (req, res) => {
     res.status(500).json({ message: 'Error adding customer', error });
   }
 };
+
+// Get the total count of customers
+export const getCustomerCount = async (req, res) => {
+  try {
+    const customerCount = await Customer.countDocuments();
+    res.status(200).json({ count: customerCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving customer count', error });
+  }
+};
+
 
 // Update an existing customer
 export const updateCustomer = async (req, res) => {
@@ -40,9 +52,9 @@ export const updateCustomer = async (req, res) => {
       return res.status(404).json({ message: 'Customer not found' });
     }
 
-    // Check if email is already in use by another customer
-    const existingCustomer = await Customer.findOne({ email, _id: { $ne: customerId } });
-    if (existingCustomer) {
+    // Check for unique constraints
+    const existingCustomerByEmail = await Customer.findOne({ email, _id: { $ne: customerId } });
+    if (existingCustomerByEmail) {
       return res.status(400).json({ message: 'Email is already in use' });
     }
 
@@ -104,3 +116,15 @@ export const deleteCustomer = async (req, res) => {
   }
 };
 
+// Search customers by name
+export const searchCustomerByName = async (req, res) => {
+  try {
+    const { name } = req.query;
+
+    // Find customers whose names contain the search term (case-insensitive)
+    const customers = await Customer.find({ name: { $regex: name, $options: 'i' } });
+    res.status(200).json(customers);
+  } catch (error) {
+    res.status(500).json({ message: 'Error searching customers', error });
+  }
+};
